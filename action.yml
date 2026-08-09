@@ -1,0 +1,59 @@
+name: 'QQ Group Notify'
+description: 'Send text/markdown messages and file URLs to a QQ group via QQ Bot proactive API'
+author: 'H3CoF6'
+
+branding:
+  icon: 'message-square'
+  color: 'blue'
+
+inputs:
+  appid:
+    description: 'QQ Bot App ID (store as repository secret QQ_APPID)'
+    required: true
+  secret:
+    description: 'QQ Bot Client Secret (store as repository secret QQ_SECRET)'
+    required: true
+  group_openid:
+    description: 'Target QQ group openid (store as repository secret QQ_GROUP_OPENID)'
+    required: true
+  message:
+    description: 'Message content to send. Supports markdown when markdown input is true.'
+    required: false
+    default: ''
+  markdown:
+    description: 'Enable markdown rendering for the message (true/false)'
+    required: false
+    default: 'true'
+  file_url:
+    description: 'Publicly accessible URL of a file to send (image/video/audio/file). File must be reachable from mainland China.'
+    required: false
+    default: ''
+  file_path:
+    description: 'Local path to a file to upload directly (base64, ≤20MB). Useful for sending CI build artifacts.'
+    required: false
+    default: ''
+  file_type:
+    description: 'Type of the file: image | video | audio | file'
+    required: false
+    default: 'file'
+  file_name:
+    description: 'Display filename shown in QQ (optional, inferred from URL if omitted)'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Send QQ group notification
+      shell: bash
+      env:
+        QQ_APP_ID: ${{ inputs.appid }}
+        QQ_CLIENT_SECRET: ${{ inputs.secret }}
+        QQ_GROUP_OPENID: ${{ inputs.group_openid }}
+        QQ_MESSAGE: ${{ inputs.message }}
+        QQ_MARKDOWN: ${{ inputs.markdown }}
+        QQ_FILE_URL: ${{ inputs.file_url }}
+        QQ_FILE_PATH: ${{ inputs.file_path }}
+        QQ_FILE_TYPE: ${{ inputs.file_type }}
+        QQ_FILE_NAME: ${{ inputs.file_name }}
+      run: node "${{ github.action_path }}/src/send.mjs"

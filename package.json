@@ -1,0 +1,13 @@
+{
+  "name": "qq-notif-action",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "get-credentials": "node scripts/get-credentials.mjs"
+  },
+  "dependencies": {
+    "@tencent-connect/qqbot-connector": "1.2.0",
+    "@tencent-connect/qqbot-nodejs": "^1.0.4"
+  }
+}
