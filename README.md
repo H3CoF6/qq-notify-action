@@ -1,4 +1,4 @@
-# qq-notif-action
+# qq-notify-action
 
 在 GitHub Actions CI 中向 QQ 群发送通知消息或文件。
 
@@ -18,8 +18,8 @@
 如果还没有 AppID / AppSecret 和群 OpenID，可以用项目内置的脚本一键获取：
 
 ```bash
-git clone https://github.com/H3CoF6/qq-notif-action.git
-cd qq-notif-action
+git clone https://github.com/H3CoF6/qq-notify-action.git
+cd qq-notify-action
 npm install
 npm run get-credentials
 ```
@@ -66,7 +66,7 @@ npm run get-credentials
 ### 发送文本消息（纯文本）
 
 ```yaml
-- uses: H3CoF6/qq-notif-action@main
+- uses: H3CoF6/qq-notify-action@main
   with:
     appid: ${{ secrets.QQ_APPID }}
     secret: ${{ secrets.QQ_SECRET }}
@@ -78,7 +78,7 @@ npm run get-credentials
 ### 发送 Markdown 消息（默认）
 
 ```yaml
-- uses: H3CoF6/qq-notif-action@main
+- uses: H3CoF6/qq-notify-action@main
   with:
     appid: ${{ secrets.QQ_APPID }}
     secret: ${{ secrets.QQ_SECRET }}
@@ -96,7 +96,7 @@ npm run get-credentials
 ### 直接发送本地文件（≤20MB，推荐用于 CI 产物）
 
 ```yaml
-- uses: H3CoF6/qq-notif-action@main
+- uses: H3CoF6/qq-notify-action@main
   with:
     appid: ${{ secrets.QQ_APPID }}
     secret: ${{ secrets.QQ_SECRET }}
@@ -111,7 +111,7 @@ npm run get-credentials
 ### 发送文件（通过公开 URL）
 
 ```yaml
-- uses: H3CoF6/qq-notif-action@main
+- uses: H3CoF6/qq-notify-action@main
   with:
     appid: ${{ secrets.QQ_APPID }}
     secret: ${{ secrets.QQ_SECRET }}
@@ -138,7 +138,7 @@ npm run get-credentials
 ### 同时发送消息 + 本地文件
 
 ```yaml
-- uses: H3CoF6/qq-notif-action@main
+- uses: H3CoF6/qq-notify-action@main
   with:
     appid: ${{ secrets.QQ_APPID }}
     secret: ${{ secrets.QQ_SECRET }}
@@ -172,7 +172,7 @@ jobs:
 
       - name: Notify QQ on success
         if: success()
-        uses: H3CoF6/qq-notif-action@main
+        uses: H3CoF6/qq-notify-action@main
         with:
           appid: ${{ secrets.QQ_APPID }}
           secret: ${{ secrets.QQ_SECRET }}
@@ -186,7 +186,7 @@ jobs:
 
       - name: Notify QQ on failure
         if: failure()
-        uses: H3CoF6/qq-notif-action@main
+        uses: H3CoF6/qq-notify-action@main
         with:
           appid: ${{ secrets.QQ_APPID }}
           secret: ${{ secrets.QQ_SECRET }}
@@ -224,7 +224,7 @@ jobs:
           files: dist.zip
 
     - name: Notify QQ
-        uses: H3CoF6/qq-notif-action@main
+        uses: H3CoF6/qq-notify-action@main
         with:
           appid: ${{ secrets.QQ_APPID }}
           secret: ${{ secrets.QQ_SECRET }}
