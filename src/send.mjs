@@ -118,6 +118,22 @@ async function sendFileSmall(token, groupOpenid, filePath, numericType, displayN
   return sendMediaMessage(token, groupOpenid, r.file_info);
 }
 
+// ── 带指数退避的重试（专为 upload_part_finish 的瞬时限流设计）──
+async function withRetry(fn, { retries = 4, baseDelayMs = 1500 } = {}) {
+  let lastErr;
+  for (let i = 0; i <= retries; i++) {
+    try { return await fn(); } catch (err) {
+      lastErr = err;
+      if (i < retries) {
+        const delay = baseDelayMs * 2 ** i;
+        console.log(`  Retry ${i + 1}/${retries} in ${delay}ms... (${err.message.slice(0, 80)})`);
+        await new Promise(r => setTimeout(r, delay));
+      }
+    }
+  }
+  throw lastErr;
+}
+
 // ── Large file: chunked upload via COS presigned URLs ──
 async function sendFileChunked(token, groupOpenid, filePath, numericType, displayName, fileSize) {
   console.log(`  Computing hashes (${(fileSize / 1024 / 1024).toFixed(1)}MB)...`);
@@ -139,8 +155,10 @@ async function sendFileChunked(token, groupOpenid, filePath, numericType, displa
     await handle.close();
     await putToCOS(part.presigned_url, buf);
     const partMd5 = createHash('md5').update(buf).digest('hex');
-    await apiFetch(token, 'POST', `/v2/groups/${groupOpenid}/upload_part_finish`,
-      { upload_id, part_index: part.index, block_size: length, md5: partMd5 });
+    await withRetry(() =>
+      apiFetch(token, 'POST', `/v2/groups/${groupOpenid}/upload_part_finish`,
+        { upload_id, part_index: part.index, block_size: length, md5: partMd5 })
+    );
     console.log(`  Part ${part.index}/${parts.length} OK`);
   }
 
