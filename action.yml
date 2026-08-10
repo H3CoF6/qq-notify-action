@@ -29,15 +29,15 @@ inputs:
     required: false
     default: ''
   file_path:
-    description: 'Local path to a file to upload directly (base64, ≤20MB). Useful for sending CI build artifacts.'
+    description: 'Local path to a file to upload directly. Single path, or newline-separated list for multiple files.'
     required: false
     default: ''
   file_type:
-    description: 'Type of the file: image | video | audio | file'
+    description: 'Type of the file: image | video | audio | file. Single value or newline-separated list matching file_path entries.'
     required: false
     default: 'file'
   file_name:
-    description: 'Display filename shown in QQ (optional, inferred from URL if omitted)'
+    description: 'Display filename shown in QQ. Single value or newline-separated list matching file_path entries.'
     required: false
     default: ''
 

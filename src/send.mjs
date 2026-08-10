@@ -181,6 +181,10 @@ async function sendFileByPath(token, groupOpenid, filePath, fileType, fileName) 
   return sendFileChunked(token, groupOpenid, filePath, numericType, displayName, size);
 }
 
+function splitLines(s) {
+  return s.split('\n').map(l => l.trim()).filter(Boolean);
+}
+
 // ── Main ──
 async function main() {
   const appId       = process.env.QQ_APP_ID;
@@ -189,15 +193,15 @@ async function main() {
   const message     = process.env.QQ_MESSAGE   || '';
   const useMarkdown = process.env.QQ_MARKDOWN  !== 'false';
   const fileUrl     = process.env.QQ_FILE_URL  || '';
-  const filePath    = process.env.QQ_FILE_PATH || '';
-  const fileType    = process.env.QQ_FILE_TYPE || 'file';
-  const fileName    = process.env.QQ_FILE_NAME || '';
+  const filePaths   = splitLines(process.env.QQ_FILE_PATH || '');
+  const fileTypes   = splitLines(process.env.QQ_FILE_TYPE || '');
+  const fileNames   = splitLines(process.env.QQ_FILE_NAME || '');
 
   if (!appId || !secret || !groupOpenid) {
     console.error('::error::Missing required inputs: appid, secret, group_openid');
     process.exit(1);
   }
-  if (!message && !fileUrl && !filePath) {
+  if (!message && !fileUrl && filePaths.length === 0) {
     console.error('::error::Must provide at least one of: message, file_url, file_path');
     process.exit(1);
   }
@@ -212,13 +216,18 @@ async function main() {
     console.log(`Message sent. id=${r.id ?? JSON.stringify(r)}`);
   }
   if (fileUrl) {
-    console.log(`Sending file via URL (${fileType})...`);
-    const r = await sendFileByUrl(token, groupOpenid, fileUrl, fileType, fileName || undefined);
+    const fType = fileTypes[0] || 'file';
+    const fName = fileNames[0] || '';
+    console.log(`Sending file via URL (${fType})...`);
+    const r = await sendFileByUrl(token, groupOpenid, fileUrl, fType, fName || undefined);
     console.log(`File sent. id=${r.id ?? JSON.stringify(r)}`);
   }
-  if (filePath) {
-    console.log(`Sending local file (${fileType}): ${filePath}`);
-    const r = await sendFileByPath(token, groupOpenid, filePath, fileType, fileName || undefined);
+  for (let i = 0; i < filePaths.length; i++) {
+    const fp    = filePaths[i];
+    const fType = fileTypes[i] ?? fileTypes[0] ?? 'file';
+    const fName = fileNames[i] ?? fileNames[0] ?? '';
+    console.log(`Sending local file (${fType}): ${fp}`);
+    const r = await sendFileByPath(token, groupOpenid, fp, fType, fName || undefined);
     console.log(`File sent. id=${r.id ?? JSON.stringify(r)}`);
   }
 }
