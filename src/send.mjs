@@ -9,7 +9,8 @@ import * as https from 'node:https';
 
 const TOKEN_URL    = 'https://bots.qq.com/app/getAppAccessToken';
 const API_BASE     = 'https://api.sgroup.qq.com';
-const MAX_B64_SIZE = 20 * 1024 * 1024;  // 20MB — base64 single-upload limit
+const MAX_B64_SIZE   = 20 * 1024 * 1024;   // 20MB — base64 single-upload limit
+const MAX_FILE_SIZE  = 200 * 1024 * 1024;  // 200MB — QQ API hard limit for chunked upload
 const MD5_10M_SIZE = 10_002_432;         // QQ spec: MD5 of first ~10MB
 
 async function getAccessToken(appId, clientSecret) {
@@ -173,6 +174,12 @@ async function sendFileByPath(token, groupOpenid, filePath, fileType, fileName) 
   const numericType = FILE_TYPE_MAP[fileType] ?? 4;
   const displayName = fileName || basename(filePath);
   console.log(`  ${displayName}  ${(size / 1024 / 1024).toFixed(1)}MB`);
+  if (size > MAX_FILE_SIZE) {
+    throw new Error(
+      `File "${displayName}" is ${(size / 1024 / 1024).toFixed(1)}MB, which exceeds the QQ API 200MB limit. ` +
+      `Please reduce the file size or provide a download URL instead of a local path.`
+    );
+  }
   if (size <= MAX_B64_SIZE) {
     console.log('  Strategy: base64 direct');
     return sendFileSmall(token, groupOpenid, filePath, numericType, displayName);
