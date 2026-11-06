@@ -250,8 +250,33 @@ jobs:
 | `file_url`     |      | `''`     | 文件的公开 URL                            |
 | `file_type`    |      | `file`   | 文件类型：`image` / `video` / `audio` / `file` |
 | `file_name`    |      | `''`     | 文件显示名（可选）                        |
+| `keyboard`     |      | `''`     | 内联键盘（链接按钮），见下                |
 
 `message` 和 `file_url` 至少需要提供一个。
+
+### 内联键盘（`keyboard`）
+
+两种写法，任选其一。
+
+**简写**：一行一组按钮，行内用逗号分隔，按钮写成 `标签=URL`（`|` 也可以）：
+
+```yaml
+- uses: H3CoF6/qq-notify-action@<sha>
+  with:
+    message: '## v1.0.0 发布'
+    keyboard: |
+      win=https://example.com/app.exe, web-win=https://example.com/web-win.zip
+      linux-x64=https://example.com/app.AppImage, web-linux=https://example.com/web-linux.tar.gz
+```
+
+**JSON**：直接贴平台结构 `{"content":{"rows":[{"buttons":[...]}]}}`，原样透传。
+
+限制与行为：
+
+- **最多 5 行**（QQ 平台硬限制，超了报 `40034029`）。列数没有严格限制，单行 5–6 个可以发。
+- 按钮动作固定为「跳转链接」（`action.type: 0`）。
+- 有 `message` 时键盘挂在正文消息上；没有正文时挂到第一个附件上。
+- 按钮标签别太长，长了会被平台截断。
 
 ## 运行环境要求
 
