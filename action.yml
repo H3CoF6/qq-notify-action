@@ -40,6 +40,16 @@ inputs:
     description: 'Display filename shown in QQ. Single value or newline-separated list matching file_path entries.'
     required: false
     default: ''
+  keyboard:
+    description: |
+      Inline keyboard (buttons). Two forms:
+        - JSON: {"content":{"rows":[{"buttons":[...]}]}} (platform structure, passed through)
+        - Shorthand: one line per row, buttons separated by commas, each as "label=URL"
+          e.g. "win=https://…/setup.exe, mac-arm=https://…/arm64.dmg"
+      QQ limits this to 5 rows; exceeding it fails with code 40034029.
+      Attached to the message when `message` is set, otherwise to the first file.
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -56,4 +66,5 @@ runs:
         QQ_FILE_PATH: ${{ inputs.file_path }}
         QQ_FILE_TYPE: ${{ inputs.file_type }}
         QQ_FILE_NAME: ${{ inputs.file_name }}
+        QQ_KEYBOARD: ${{ inputs.keyboard }}
       run: node "${{ github.action_path }}/src/send.mjs"
